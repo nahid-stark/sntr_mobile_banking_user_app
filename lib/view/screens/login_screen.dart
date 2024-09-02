@@ -144,7 +144,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 if(userLoginController.userLoginDataModel.password == _passwordTEController.text.trim()) {
                   if(userLoginController.userLoginDataModel.accountOkay!) {
                     LoggedInUserData.userAccount = _userAccountNoTEController.text.trim();
-                    LoggedInUserData.password = _userAccountNoTEController.text.trim();
+                    LoggedInUserData.password = _passwordTEController.text.trim();
                     Get.offAll(() => const HomeScreen());
                   } else {
                     Get.offAll(() => AccountCreationCompleteScreen(userAccountNo: _userAccountNoTEController.text.trim()));

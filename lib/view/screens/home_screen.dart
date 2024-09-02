@@ -2,10 +2,12 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:sntr_mobile_banking_user_app/controller/home_screen_controller.dart';
 import 'package:sntr_mobile_banking_user_app/data/logged_in_user_data.dart';
 import 'package:sntr_mobile_banking_user_app/view/screens/send_money_screen.dart';
+import 'package:sntr_mobile_banking_user_app/view/screens/transaction_screen.dart';
 import 'package:sntr_mobile_banking_user_app/view/widgets/app_logo.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -17,6 +19,8 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   static int flag = 0;
+  int beforeTransaction = 0;
+  FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
   final List<Image> serviceIcons = [
     Image.asset("assets/icons/send_money.png"),
     Image.asset("assets/icons/money_withdraw.png"),
@@ -44,6 +48,15 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     Get.find<HomeScreenController>().getHomeScreenData();
+
+    const AndroidInitializationSettings initializationSettingsAndroid = AndroidInitializationSettings('brand_icon');
+    const InitializationSettings initializationSettings = InitializationSettings(
+      android: initializationSettingsAndroid,
+    );
+    flutterLocalNotificationsPlugin.initialize(
+      initializationSettings,
+      onDidReceiveNotificationResponse: (NotificationResponse response) async {},
+    );
   }
 
   @override
@@ -95,6 +108,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           case 2:
                             break;
                           case 3:
+                            Get.to(() => const TransactionScreen());
                             break;
                           case 4:
                             break;
@@ -175,12 +189,13 @@ class _HomeScreenState extends State<HomeScreen> {
           StreamBuilder(
             stream: firebaseFirestore.collection("user_account_balance").doc(LoggedInUserData.userAccount).snapshots(),
             builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+              LoggedInUserData.accountBalance = int.parse(snapshot.data?.get("balance") ?? "0");
               if (flag == 0 || flag == 1) {
                 flag++;
               } else {
-                ///TODO : implement notification for send and receive money
+                //_showNotificationOnTransaction();
               }
-              LoggedInUserData.accountBalance = int.parse(snapshot.data?.get("balance") ?? "0");
+              beforeTransaction = LoggedInUserData.accountBalance;
               return Text(
                 "৳ " "${snapshot.data?.get("balance") ?? "0"}",
                 style: const TextStyle(
@@ -204,7 +219,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return AppBar(
       title: GetBuilder<HomeScreenController>(
         builder: (homeScreenController) {
-          if(homeScreenController.inProgress) {
+          if (homeScreenController.inProgress) {
             return const CircularProgressIndicator();
           }
           return _buildAppBarLeading(
@@ -270,6 +285,28 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
       ],
+    );
+  }
+
+  Future<void> _showNotificationOnTransaction() async {
+    const AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
+      'your_channel_id',
+      'your_channel_name',
+      importance: Importance.max,
+      priority: Priority.high,
+      ticker: 'ticker',
+    );
+    const NotificationDetails platformChannelSpecifics = NotificationDetails(
+      android: androidPlatformChannelSpecifics,
+    );
+    await flutterLocalNotificationsPlugin.show(
+      0,
+      beforeTransaction > LoggedInUserData.accountBalance ? 'Send Money' : "Receive Money",
+      beforeTransaction > LoggedInUserData.accountBalance
+          ? 'Amount ${beforeTransaction - LoggedInUserData.accountBalance}'
+          : 'Amount ${LoggedInUserData.accountBalance - beforeTransaction}',
+      platformChannelSpecifics,
+      payload: 'item id 2',
     );
   }
 }

@@ -95,50 +95,73 @@ class _MoneyAmountAndPasswordForSendMoneyScreenState extends State<MoneyAmountAn
                 Padding(
                   padding: const EdgeInsets.only(left: 24, right: 36, bottom: 24, top: 24),
                   child: GetBuilder<SendMoneyController>(builder: (sendMoneyController) {
-                    return ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        fixedSize: const Size.fromWidth(double.maxFinite),
-                        padding: const EdgeInsets.symmetric(vertical: 0),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        backgroundColor: Colors.green,
-                        foregroundColor: Colors.white,
-                        textStyle: const TextStyle(
-                          fontWeight: FontWeight.w400,
-                          fontSize: 24,
-                        ),
-                      ),
-                      onPressed: () {
-                        if (_formKey.currentState!.validate()) {
-                          if (int.parse(_sendAmountTEController.text) > 0) {
-                            if (int.parse(_sendAmountTEController.text) <= LoggedInUserData.accountBalance) {
-                              // functionality goes here
-                            } else {
-                              SnackBarMessage.snackbarMessage(
-                                title: "Invalid Amount",
-                                message: "Not Enough Money",
-                                type: false,
-                              );
-                            }
-                          } else {
-                            SnackBarMessage.snackbarMessage(
-                              title: "Invalid Amount",
-                              message: "Amount Can't Be Less Than One",
-                              type: false,
-                            );
-                          }
-                          //Get.back();
-                          /*
-                            1. check the sender balance(done)
-                            2. change sender balance
-                            3. change receiver balance
-                            4. change transaction history for sender
-                            5. change transaction history for receiver
-                             */
+                    return GetBuilder<SendMoneyController>(
+                      builder: (sendMoneyController) {
+                        if(sendMoneyController.inProgress) {
+                          return const Center(child: CircularProgressIndicator());
                         }
-                      },
-                      child: const Text("Send"),
+                        return ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            fixedSize: const Size.fromWidth(double.maxFinite),
+                            padding: const EdgeInsets.symmetric(vertical: 0),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            backgroundColor: Colors.green,
+                            foregroundColor: Colors.white,
+                            textStyle: const TextStyle(
+                              fontWeight: FontWeight.w400,
+                              fontSize: 24,
+                            ),
+                          ),
+                          onPressed: () async {
+                            if (_formKey.currentState!.validate()) {
+                              if (int.parse(_sendAmountTEController.text) > 0) {
+                                if (int.parse(_sendAmountTEController.text) <= LoggedInUserData.accountBalance) {
+                                  if(_passwordTEController.text.trim() == LoggedInUserData.password) {
+                                    bool result = await sendMoneyController.sendMoney(widget.receiverUserId, _sendAmountTEController.text.trim());
+                                    if(result) {
+                                      Get.back();
+                                    } else {
+                                      SnackBarMessage.snackbarMessage(
+                                        title: "Operation Failed",
+                                        message: "Something Wrong",
+                                        type: false,
+                                      );
+                                    }
+                                  } else {
+                                    SnackBarMessage.snackbarMessage(
+                                      title: "Incorrect Password",
+                                      message: "Wrong Password",
+                                      type: false,
+                                    );
+                                  }
+                                } else {
+                                  SnackBarMessage.snackbarMessage(
+                                    title: "Invalid Amount",
+                                    message: "Not Enough Money",
+                                    type: false,
+                                  );
+                                }
+                              } else {
+                                SnackBarMessage.snackbarMessage(
+                                  title: "Invalid Amount",
+                                  message: "Amount Can't Be Less Than One",
+                                  type: false,
+                                );
+                              }
+                              /*
+                                1. check the sender balance(done)
+                                2. change sender balance
+                                3. change receiver balance
+                                4. change transaction history for sender
+                                5. change transaction history for receiver
+                                 */
+                            }
+                          },
+                          child: const Text("Send"),
+                        );
+                      }
                     );
                   }),
                 ),
@@ -148,5 +171,11 @@ class _MoneyAmountAndPasswordForSendMoneyScreenState extends State<MoneyAmountAn
         ),
       ),
     );
+  }
+  @override
+  void dispose() {
+    _sendAmountTEController.dispose();
+    _passwordTEController.dispose();
+    super.dispose();
   }
 }
