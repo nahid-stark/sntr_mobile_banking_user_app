@@ -74,7 +74,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget buildServiceList() {
+  Widget buildServiceList() {  //agile
     return Expanded(
       child: Container(
         decoration: const BoxDecoration(
@@ -193,7 +193,7 @@ class _HomeScreenState extends State<HomeScreen> {
               if (flag == 0 || flag == 1) {
                 flag++;
               } else {
-                //_showNotificationOnTransaction();
+                _showNotificationOnTransaction();
               }
               beforeTransaction = LoggedInUserData.accountBalance;
               return Text(

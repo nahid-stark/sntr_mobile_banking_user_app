@@ -24,8 +24,13 @@ class TransactionHistoryController extends GetxController {
     _inProgress = true;
     update();
     final FirebaseFirestore firebaseFirestoreInstance = FirebaseFirestore.instance;
-    DocumentSnapshot transactionHistory = await firebaseFirestoreInstance.collection("transactions").doc(LoggedInUserData.userAccount).get();
     DocumentSnapshot transactionIdListData = await firebaseFirestoreInstance.collection("transactionIdList").doc(LoggedInUserData.userAccount).get();
+    if(transactionIdListData.data() == null) {
+      _inProgress = false;
+      update();
+      return false;
+    }
+    DocumentSnapshot transactionHistory = await firebaseFirestoreInstance.collection("transactions").doc(LoggedInUserData.userAccount).get();
     List<dynamic> transactionIdList = (transactionIdListData.get("transactionId"));
     _transactionDataList = TransactionModel.fromJson(
       transactionHistory.data() as Map<String, dynamic>,

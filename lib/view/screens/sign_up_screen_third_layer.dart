@@ -60,7 +60,7 @@ class _SignUpScreenThirdLayerState extends State<SignUpScreenThirdLayer> {
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         fixedSize: const Size.fromWidth(150),
-                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        padding: const EdgeInsets.symmetric(vertical: 2),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),
@@ -74,12 +74,17 @@ class _SignUpScreenThirdLayerState extends State<SignUpScreenThirdLayer> {
                       onPressed: () {
                         _imagePicker("camera");
                       },
-                      child: const Text("Take A Picture"),
+                      child: Image.asset(
+                        "assets/icons/camera_icon.png",
+                        height: 40,
+                        width: 40,
+                        color: Colors.white,
+                      ),
                     ),
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         fixedSize: const Size.fromWidth(150),
-                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        padding: const EdgeInsets.symmetric(vertical: 2),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),
@@ -93,7 +98,12 @@ class _SignUpScreenThirdLayerState extends State<SignUpScreenThirdLayer> {
                       onPressed: () {
                         _imagePicker("gallery");
                       },
-                      child: const Text("From Gallery"),
+                      child: Image.asset(
+                        "assets/icons/gallery_icon.png",
+                        height: 40,
+                        width: 40,
+                        color: Colors.white,
+                      ),
                     ),
                   ],
                 ),
