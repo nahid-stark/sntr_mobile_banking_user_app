@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:sntr_mobile_banking_user_app/controller/user_login_controller.dart';
 import 'package:sntr_mobile_banking_user_app/data/logged_in_user_data.dart';
 import 'package:sntr_mobile_banking_user_app/view/screens/account_creation_complete_screen.dart';
